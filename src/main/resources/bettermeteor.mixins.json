@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "com.bettermeteor.addon.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "WidgetScreenModuleAnimationMixin",
+    "MeteorGuiThemeMixin",
+    "WindowScreenAccessor",
+    "WWindowAccessor",
+    "WMeteorWindowMixin",
+    "WMeteorWindowHeaderMixin",
+    "WTopBarButtonMixin",
+    "WTopBarAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
