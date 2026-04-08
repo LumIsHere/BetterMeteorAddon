@@ -83,7 +83,7 @@ public class ItemNametags extends Module {
     private final Setting<Double> maxRange = sgGeneral.add(new DoubleSetting.Builder()
         .name("max-range")
         .description("Only render item nametags within this range.")
-        .defaultValue(64)
+        .defaultValue(128)
         .min(0)
         .sliderMax(512)
         .build()
