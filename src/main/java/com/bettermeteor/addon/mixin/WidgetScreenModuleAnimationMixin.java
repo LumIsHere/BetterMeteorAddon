@@ -28,12 +28,14 @@ public abstract class WidgetScreenModuleAnimationMixin {
         bettermeteor$moduleFinalX = centeredX;
         if (window.x != bettermeteor$moduleFinalX) window.move(bettermeteor$moduleFinalX - window.x, 0);
 
-        double speed = Math.max(delta / 7.0, 0.12);
+        // 🔽 Slower animation here
+        double speed = Math.max(delta / 15.0, 0.03);
         bettermeteor$moduleTransitionProgress = Math.min(1, bettermeteor$moduleTransitionProgress + speed);
 
         double eased = bettermeteor$moduleClosingAnimation
             ? easeInBack(bettermeteor$moduleTransitionProgress)
             : easeOutBack(bettermeteor$moduleTransitionProgress);
+
         double offsetX = Math.round(getWindowWidth() * (bettermeteor$moduleClosingAnimation ? eased : eased - 1));
         double desiredX = bettermeteor$moduleFinalX + offsetX;
         if (window.x != desiredX) window.move(desiredX - window.x, 0);
