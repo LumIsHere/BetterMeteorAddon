@@ -1,9 +1,9 @@
 package com.bettermeteor.addon;
 
 import com.bettermeteor.addon.commands.CommandExample;
+import com.bettermeteor.addon.hud.EnderPearlInfoHud;
 import com.bettermeteor.addon.modules.SignCommand;
 import com.bettermeteor.addon.hud.HudExample;
-import com.bettermeteor.addon.modules.EnderPearlTimer;
 import com.bettermeteor.addon.modules.HumanAutoTotem;
 import com.bettermeteor.addon.modules.ItemNametags;
 import com.mojang.logging.LogUtils;
@@ -27,7 +27,6 @@ public class BetterMeteorAddon extends MeteorAddon {
 
         // Modules
         Modules.get().add(new SignCommand());
-        Modules.get().add(new EnderPearlTimer());
         Modules.get().add(new HumanAutoTotem());
         Modules.get().add(new ItemNametags());
 
@@ -36,6 +35,7 @@ public class BetterMeteorAddon extends MeteorAddon {
 
         // HUD
         Hud.get().register(HudExample.INFO);
+        Hud.get().register(EnderPearlInfoHud.INFO);
     }
 
     @Override
