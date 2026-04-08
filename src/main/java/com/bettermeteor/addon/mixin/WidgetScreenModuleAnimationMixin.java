@@ -10,25 +10,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static meteordevelopment.meteorclient.utils.Utils.getWindowWidth;
-
 @Mixin(WidgetScreen.class)
 public abstract class WidgetScreenModuleAnimationMixin {
     @Unique private double bettermeteor$moduleTransitionProgress;
     @Unique private boolean bettermeteor$moduleClosingAnimation;
     @Unique private boolean bettermeteor$moduleAllowClose;
-    @Unique private double bettermeteor$moduleFinalX = Double.NaN;
+    @Unique private double bettermeteor$moduleAnchorX = Double.NaN;
 
     @Inject(method = "renderCustom", at = @At("HEAD"))
     private void bettermeteor$animateModuleScreen(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!((Object) this instanceof ModuleScreen)) return;
 
         WWindow window = ((WindowScreenAccessor) this).bettermeteor$getWindow();
-        double centeredX = Math.round((getWindowWidth() - window.width) / 2.0);
-        bettermeteor$moduleFinalX = centeredX;
-        if (window.x != bettermeteor$moduleFinalX) window.move(bettermeteor$moduleFinalX - window.x, 0);
+        if (Double.isNaN(bettermeteor$moduleAnchorX)) {
+            if (window.width <= 0) return;
 
-        // 🔽 Slower animation here
+            bettermeteor$moduleAnchorX = window.x;
+        }
+
+        boolean animating = bettermeteor$moduleClosingAnimation || bettermeteor$moduleTransitionProgress < 1;
+        if (!animating) return;
+
         double speed = Math.max(delta / 15.0, 0.03);
         bettermeteor$moduleTransitionProgress = Math.min(1, bettermeteor$moduleTransitionProgress + speed);
 
@@ -36,8 +38,8 @@ public abstract class WidgetScreenModuleAnimationMixin {
             ? easeInBack(bettermeteor$moduleTransitionProgress)
             : easeOutBack(bettermeteor$moduleTransitionProgress);
 
-        double offsetX = Math.round(getWindowWidth() * (bettermeteor$moduleClosingAnimation ? eased : eased - 1));
-        double desiredX = bettermeteor$moduleFinalX + offsetX;
+        double offsetX = Math.round(window.width * 1.35 * (bettermeteor$moduleClosingAnimation ? eased : eased - 1));
+        double desiredX = bettermeteor$moduleAnchorX + offsetX;
         if (window.x != desiredX) window.move(desiredX - window.x, 0);
 
         if (bettermeteor$moduleClosingAnimation && bettermeteor$moduleTransitionProgress >= 1) {
@@ -51,9 +53,12 @@ public abstract class WidgetScreenModuleAnimationMixin {
     private void bettermeteor$cleanupModuleScreenMatrix(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!((Object) this instanceof ModuleScreen)) return;
 
+        boolean animating = bettermeteor$moduleClosingAnimation || bettermeteor$moduleTransitionProgress < 1;
+        if (!animating) return;
+
         WWindow window = ((WindowScreenAccessor) this).bettermeteor$getWindow();
-        if (!Double.isNaN(bettermeteor$moduleFinalX) && window.x != bettermeteor$moduleFinalX) {
-            window.move(bettermeteor$moduleFinalX - window.x, 0);
+        if (!Double.isNaN(bettermeteor$moduleAnchorX) && window.x != bettermeteor$moduleAnchorX) {
+            window.move(bettermeteor$moduleAnchorX - window.x, 0);
         }
     }
 
@@ -74,7 +79,7 @@ public abstract class WidgetScreenModuleAnimationMixin {
         bettermeteor$moduleTransitionProgress = 0;
         bettermeteor$moduleClosingAnimation = false;
         bettermeteor$moduleAllowClose = false;
-        bettermeteor$moduleFinalX = Double.NaN;
+        bettermeteor$moduleAnchorX = Double.NaN;
     }
 
     @Unique
