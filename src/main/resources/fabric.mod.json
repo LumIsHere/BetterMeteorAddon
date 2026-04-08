@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "addon-template",
+  "id": "bettermeteor",
   "version": "${version}",
-  "name": "Addon Template",
-  "description": "An addon template for Meteor Client addons.",
+  "name": "BetterMeteor",
+  "description": "A Meteor Client addon for Minecraft 1.21.11.",
   "authors": [
-    "seasnail"
+    "BetterMeteor"
   ],
   "contact": {
-    "sources": "https://github.com/MeteorDevelopment/meteor-addon-template"
+    "sources": "https://github.com/bettermeteor/bettermeteor"
   },
-  "icon": "assets/template/icon.png",
+  "icon": "assets/bettermeteor/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "com.example.addon.AddonTemplate"
+      "com.bettermeteor.addon.BetterMeteorAddon"
     ]
   },
   "mixins": [
-    "addon-template.mixins.json"
+    "bettermeteor.mixins.json"
   ],
   "custom": {
     "meteor-client:color": "225,25,25",
