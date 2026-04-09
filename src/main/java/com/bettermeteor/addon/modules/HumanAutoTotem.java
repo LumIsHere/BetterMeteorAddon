@@ -1,6 +1,5 @@
 package com.bettermeteor.addon.modules;
 
-import com.bettermeteor.addon.BetterMeteorAddon;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IClientPlayerInteractionManager;
@@ -8,6 +7,7 @@ import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
@@ -214,7 +214,7 @@ public class HumanAutoTotem extends Module {
     private long nextActionAtMs;
 
     public HumanAutoTotem() {
-        super(BetterMeteorAddon.CATEGORY, "human-auto-totem", "Smart totem switching with separate danger checks and randomized millisecond delays.");
+        super(Categories.Combat, "human-auto-totem", "Smart totem switching with separate danger checks and randomized millisecond delays.");
     }
 
     @Override

@@ -28,6 +28,7 @@ import meteordevelopment.meteorclient.settings.ItemListSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.config.Config;
+import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.IChangeable;
@@ -187,7 +188,7 @@ public class ItemNametags extends Module {
     private final Vector3d groupPos = new Vector3d();
 
     public ItemNametags() {
-        super(BetterMeteorAddon.CATEGORY, "item-nametags", "Displays nametags above selected dropped items.");
+        super(Categories.Render, "item-nametags", "Displays nametags above selected dropped items.");
         ItemEnchantmentFilterSetting.registerWidgetFactory();
         bindItemEnchantments();
     }

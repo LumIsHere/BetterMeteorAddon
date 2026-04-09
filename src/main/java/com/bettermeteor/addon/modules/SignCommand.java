@@ -1,6 +1,5 @@
 package com.bettermeteor.addon.modules;
 
-import com.bettermeteor.addon.BetterMeteorAddon;
 import meteordevelopment.meteorclient.events.entity.player.StartBreakingBlockEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.EnumSetting;
@@ -8,6 +7,7 @@ import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
+import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -39,7 +39,7 @@ public class SignCommand extends Module {
     );
 
     public SignCommand() {
-        super(BetterMeteorAddon.CATEGORY, "sign-command", "Copies and runs a customizable command using the selected line of a clicked sign.");
+        super(Categories.Misc, "sign-command", "Copies and runs a customizable command using the selected line of a clicked sign.");
     }
 
     @Override
