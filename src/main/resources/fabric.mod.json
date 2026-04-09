@@ -5,7 +5,9 @@
   "name": "BetterMeteor",
   "description": "A Meteor Client addon for Minecraft 1.21.11.",
   "authors": [
-    "BetterMeteor"
+    "Lum",
+    "Holly",
+    "Codex"
   ],
   "contact": {
     "sources": "https://github.com/bettermeteor/bettermeteor"
