@@ -5,7 +5,6 @@
   "client": [
     "WidgetScreenModuleAnimationMixin",
     "MeteorGuiThemeMixin",
-    "NametagsMixin",
     "PlayerEntityRendererMixin",
     "WindowScreenAccessor",
     "WWindowAccessor",
