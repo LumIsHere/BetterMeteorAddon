@@ -6,9 +6,7 @@ import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.render.Nametags;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,10 +37,10 @@ public abstract class NametagsMixin {
         method = "renderNametagPlayer",
         at = @At(
             value = "INVOKE",
-            target = "Lmeteordevelopment/meteorclient/utils/player/PlayerUtils;getPlayerColor(Lnet/minecraft/entity/player/PlayerEntity;Lmeteordevelopment/meteorclient/utils/render/color/SettingColor;)Lmeteordevelopment/meteorclient/utils/render/color/Color;"
+            target = "Lmeteordevelopment/meteorclient/utils/player/PlayerUtils;getPlayerColor(Lnet/minecraft/entity/player/PlayerEntity;Lmeteordevelopment/meteorclient/utils/render/color/Color;)Lmeteordevelopment/meteorclient/utils/render/color/Color;"
         )
     )
-    private Color bettermeteor$maybeKeepNamesWhite(PlayerEntity player, SettingColor fallbackColor, Operation<Color> original) {
+    private Color bettermeteor$maybeKeepNamesWhite(PlayerEntity player, Color fallbackColor, Operation<Color> original) {
         if (bettermeteor$usePlayerNameColor != null && bettermeteor$usePlayerNameColor.get()) {
             return original.call(player, fallbackColor);
         }
