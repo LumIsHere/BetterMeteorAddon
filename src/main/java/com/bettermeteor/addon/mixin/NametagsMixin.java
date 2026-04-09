@@ -6,6 +6,7 @@ import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.render.Nametags;
+import meteordevelopment.meteorclient.utils.misc.text.TextUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -26,8 +27,8 @@ public abstract class NametagsMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void bettermeteor$addNameColorModeSetting(CallbackInfo ci) {
         bettermeteor$usePlayerNameColor = sgRender.add(new BoolSetting.Builder()
-            .name("use-player-name-color")
-            .description("Uses the player's name color instead of keeping names white.")
+            .name("use-team-color")
+            .description("Uses the player's Minecraft team color instead of keeping names white.")
             .defaultValue(true)
             .build()
         );
@@ -42,9 +43,10 @@ public abstract class NametagsMixin {
     )
     private Color bettermeteor$maybeKeepNamesWhite(PlayerEntity player, Color fallbackColor, Operation<Color> original) {
         if (bettermeteor$usePlayerNameColor != null && bettermeteor$usePlayerNameColor.get()) {
-            return original.call(player, fallbackColor);
+            Color teamColor = TextUtils.getMostPopularColor(player.getDisplayName());
+            if (!Color.WHITE.equals(teamColor)) return new Color(teamColor).a(fallbackColor.a);
         }
 
-        return Color.WHITE;
+        return new Color(Color.WHITE).a(fallbackColor.a);
     }
 }
