@@ -40,7 +40,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererOutlineMixin {
     @Unique
-    private static final MurderMysteryOutlineShader bettermeteor$shader = new MurderMysteryOutlineShader();
+    private static MurderMysteryOutlineShader bettermeteor$shader;
 
     @Unique
     private final OutlineRenderCommandQueue bettermeteor$outlineRenderCommandQueue = new OutlineRenderCommandQueue();
@@ -71,12 +71,14 @@ public abstract class WorldRendererOutlineMixin {
                                            boolean shouldRenderSky,
                                            CallbackInfo ci) {
         if (bettermeteor$murderMystery == null) bettermeteor$murderMystery = Modules.get().get(MurderMystery.class);
+        if (bettermeteor$shader == null) bettermeteor$shader = new MurderMysteryOutlineShader();
         bettermeteor$shader.clearTexture();
     }
 
     @Inject(method = "pushEntityRenders", at = @At("TAIL"))
     private void bettermeteor$onPushEntityRenders(MatrixStack matrices, WorldRenderState worldState, OrderedRenderCommandQueue queue, CallbackInfo ci) {
         if (bettermeteor$murderMystery == null) bettermeteor$murderMystery = Modules.get().get(MurderMystery.class);
+        if (bettermeteor$shader == null) bettermeteor$shader = new MurderMysteryOutlineShader();
         if (bettermeteor$murderMystery == null || !bettermeteor$murderMystery.shouldForceRender()) return;
 
         if (bettermeteor$renderDispatcher == null) {
@@ -96,6 +98,7 @@ public abstract class WorldRendererOutlineMixin {
 
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;draw()V"))
     private void bettermeteor$submitVertices(CallbackInfo ci) {
+        if (bettermeteor$shader == null) return;
         bettermeteor$shader.submitVertices();
     }
 
@@ -111,11 +114,13 @@ public abstract class WorldRendererOutlineMixin {
                                            Vector4f fogColor,
                                            boolean shouldRenderSky,
                                            CallbackInfo ci) {
+        if (bettermeteor$shader == null) return;
         bettermeteor$shader.render();
     }
 
     @Inject(method = "onResized", at = @At("HEAD"))
     private void bettermeteor$onResized(int width, int height, CallbackInfo ci) {
+        if (bettermeteor$shader == null) return;
         bettermeteor$shader.onResized(width, height);
     }
 
@@ -128,6 +133,7 @@ public abstract class WorldRendererOutlineMixin {
 
     @Unique
     private void bettermeteor$draw(WorldRenderState worldState, MatrixStack matrices, Function<Entity, Color> colorGetter) {
+        if (bettermeteor$shader == null) return;
         var camera = worldState.cameraRenderState.pos;
         boolean empty = true;
 
