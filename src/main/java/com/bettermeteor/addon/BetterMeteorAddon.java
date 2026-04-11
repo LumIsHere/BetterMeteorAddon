@@ -1,6 +1,7 @@
 package com.bettermeteor.addon;
 
 import com.bettermeteor.addon.hud.EnderPearlInfoHud;
+import com.bettermeteor.addon.modules.Crystal;
 import com.bettermeteor.addon.modules.HandChams;
 import com.bettermeteor.addon.modules.MurderMystery;
 import com.bettermeteor.addon.modules.SignCommand;
@@ -33,6 +34,7 @@ public class BetterMeteorAddon extends MeteorAddon {
         // Modules
         Modules.get().add(new SignCommand());
         Modules.get().add(new HumanAutoTotem());
+        Modules.get().add(new Crystal());
         Modules.get().add(new ItemNametags());
         Modules.get().add(new HandChams());
         Modules.get().add(new MurderMystery());
