@@ -23,7 +23,7 @@ public abstract class WidgetScreenModuleAnimationMixin implements WidgetScreenMo
         if (!((Object) this instanceof ModuleScreen)) return;
 
         bettermeteor$moduleWindow = ((WindowScreenAccessor) this).bettermeteor$getWindow();
-        double speed = Math.max(delta / 15.0, 0.03);
+        double speed = Math.max(delta / 10.0, 0.03);
         bettermeteor$moduleTransitionProgress = Math.min(1, bettermeteor$moduleTransitionProgress + speed);
 
         if (bettermeteor$moduleClosingAnimation && bettermeteor$moduleTransitionProgress >= 1) {
