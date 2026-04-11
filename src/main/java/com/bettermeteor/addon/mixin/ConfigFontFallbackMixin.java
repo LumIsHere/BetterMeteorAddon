@@ -33,7 +33,12 @@ public abstract class ConfigFontFallbackMixin implements ConfigFontFallbackAcces
             .description("Ordered fallback custom fonts. Top to bottom: if the first font lacks a character, the next font is used.")
             .visible(customFont::get)
             .onChanged(value -> {
-                if (Fonts.RENDERER != null) Fonts.load(font.get());
+                if (Fonts.RENDERER != null) {
+                    Fonts.RENDERER.destroy();
+                    Fonts.RENDERER = null;
+                }
+
+                Fonts.load(font.get());
             })
             .build());
     }
