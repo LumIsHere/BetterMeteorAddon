@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -23,7 +24,9 @@ import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class MurderMystery extends Module {
@@ -33,6 +36,55 @@ public class MurderMystery extends Module {
     private static final Color PLAYER_COLOR = new Color(255, 255, 255);
     private static final Color MURDERER_COLOR = new Color(255, 0, 0);
     private static final Color DETECTIVE_COLOR = new Color(255, 255, 0);
+    private static final Set<Item> MURDERER_MAINHAND_ITEMS = new HashSet<>();
+
+    static {
+        MURDERER_MAINHAND_ITEMS.add(Items.IRON_SWORD);
+        MURDERER_MAINHAND_ITEMS.add(Items.STONE_SWORD);
+        MURDERER_MAINHAND_ITEMS.add(Items.IRON_SHOVEL);
+        MURDERER_MAINHAND_ITEMS.add(Items.STICK);
+        MURDERER_MAINHAND_ITEMS.add(Items.WOODEN_AXE);
+        MURDERER_MAINHAND_ITEMS.add(Items.WOODEN_SWORD);
+        MURDERER_MAINHAND_ITEMS.add(Items.DEAD_BUSH);
+        MURDERER_MAINHAND_ITEMS.add(Items.SUGAR_CANE);
+        MURDERER_MAINHAND_ITEMS.add(Items.STONE_SHOVEL);
+        MURDERER_MAINHAND_ITEMS.add(Items.BLAZE_ROD);
+        MURDERER_MAINHAND_ITEMS.add(Items.DIAMOND_SHOVEL);
+        MURDERER_MAINHAND_ITEMS.add(Items.QUARTZ);
+        MURDERER_MAINHAND_ITEMS.add(Items.PUMPKIN_PIE);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_PICKAXE);
+        MURDERER_MAINHAND_ITEMS.add(Items.LEATHER);
+        MURDERER_MAINHAND_ITEMS.add(Items.NAME_TAG);
+        MURDERER_MAINHAND_ITEMS.add(Items.CHARCOAL);
+        MURDERER_MAINHAND_ITEMS.add(Items.FLINT);
+        MURDERER_MAINHAND_ITEMS.add(Items.BONE);
+        MURDERER_MAINHAND_ITEMS.add(Items.CARROT);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_CARROT);
+        MURDERER_MAINHAND_ITEMS.add(Items.COOKIE);
+        MURDERER_MAINHAND_ITEMS.add(Items.DIAMOND_AXE);
+        MURDERER_MAINHAND_ITEMS.add(Items.ROSE_BUSH);
+        MURDERER_MAINHAND_ITEMS.add(Items.PRISMARINE_SHARD);
+        MURDERER_MAINHAND_ITEMS.add(Items.COOKED_BEEF);
+        MURDERER_MAINHAND_ITEMS.add(Items.NETHER_BRICK);
+        MURDERER_MAINHAND_ITEMS.add(Items.COOKED_CHICKEN);
+        MURDERER_MAINHAND_ITEMS.add(Items.MUSIC_DISC_BLOCKS);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_HOE);
+        MURDERER_MAINHAND_ITEMS.add(Items.LAPIS_LAZULI);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_SWORD);
+        MURDERER_MAINHAND_ITEMS.add(Items.DIAMOND_SWORD);
+        MURDERER_MAINHAND_ITEMS.add(Items.DIAMOND_HOE);
+        MURDERER_MAINHAND_ITEMS.add(Items.SHEARS);
+        MURDERER_MAINHAND_ITEMS.add(Items.SALMON);
+        MURDERER_MAINHAND_ITEMS.add(Items.RED_DYE);
+        MURDERER_MAINHAND_ITEMS.add(Items.BREAD);
+        MURDERER_MAINHAND_ITEMS.add(Items.OAK_BOAT);
+        MURDERER_MAINHAND_ITEMS.add(Items.GLISTERING_MELON_SLICE);
+        MURDERER_MAINHAND_ITEMS.add(Items.BOOK);
+        MURDERER_MAINHAND_ITEMS.add(Items.JUNGLE_SAPLING);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_AXE);
+        MURDERER_MAINHAND_ITEMS.add(Items.DIAMOND_PICKAXE);
+        MURDERER_MAINHAND_ITEMS.add(Items.GOLDEN_SHOVEL);
+    }
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -120,6 +172,7 @@ public class MurderMystery extends Module {
             if (player == mc.player) continue;
 
             Role role = getRole(player);
+            if (roles.getOrDefault(player.getUuid(), Role.NONE) == Role.MURDERER) role = Role.MURDERER;
             nextRoles.put(player.getUuid(), role);
 
             Role previousRole = roles.getOrDefault(player.getUuid(), Role.NONE);
@@ -136,7 +189,7 @@ public class MurderMystery extends Module {
         ItemStack mainHand = player.getMainHandStack();
         ItemStack offHand = player.getOffHandStack();
 
-        if (mainHand.isOf(Items.IRON_SWORD) || offHand.isOf(Items.IRON_SWORD)) return Role.MURDERER;
+        if (MURDERER_MAINHAND_ITEMS.contains(mainHand.getItem()) || offHand.isOf(Items.IRON_SWORD)) return Role.MURDERER;
         if (mainHand.isOf(Items.BOW) || offHand.isOf(Items.BOW)) return Role.DETECTIVE;
         return Role.NONE;
     }
