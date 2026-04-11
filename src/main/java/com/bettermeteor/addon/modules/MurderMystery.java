@@ -230,7 +230,10 @@ public class MurderMystery extends Module {
         if (objective == null) return false;
 
         for (ScoreboardEntry score : mc.world.getScoreboard().getScoreboardEntries(objective)) {
-            String line = Formatting.strip(score.display().getString());
+            Text display = score.display();
+            if (display == null) continue;
+
+            String line = Formatting.strip(display.getString());
             if (line != null && line.contains("Waiting...")) return true;
         }
 
