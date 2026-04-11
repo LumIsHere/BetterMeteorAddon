@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
+import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -123,6 +124,12 @@ public class MurderMystery extends Module {
             return;
         }
 
+        if (isWaitingScoreboard()) {
+            inMurderMystery = false;
+            roles.clear();
+            return;
+        }
+
         inMurderMystery = isMurderMysterySidebar();
         if (!inMurderMystery) {
             roles.clear();
@@ -172,10 +179,11 @@ public class MurderMystery extends Module {
             if (player == mc.player) continue;
 
             Role role = getRole(player);
-            if (roles.getOrDefault(player.getUuid(), Role.NONE) == Role.MURDERER) role = Role.MURDERER;
+            Role previousRole = roles.getOrDefault(player.getUuid(), Role.NONE);
+            if (previousRole == Role.MURDERER) role = Role.MURDERER;
+            else if (previousRole == Role.DETECTIVE && role == Role.NONE) role = Role.DETECTIVE;
             nextRoles.put(player.getUuid(), role);
 
-            Role previousRole = roles.getOrDefault(player.getUuid(), Role.NONE);
             if (role != previousRole && role != Role.NONE) {
                 info(buildRoleMessage(player, role));
             }
@@ -189,7 +197,7 @@ public class MurderMystery extends Module {
         ItemStack mainHand = player.getMainHandStack();
         ItemStack offHand = player.getOffHandStack();
 
-        if (MURDERER_MAINHAND_ITEMS.contains(mainHand.getItem()) || offHand.isOf(Items.IRON_SWORD)) return Role.MURDERER;
+        if (MURDERER_MAINHAND_ITEMS.contains(mainHand.getItem()) || MURDERER_MAINHAND_ITEMS.contains(offHand.getItem())) return Role.MURDERER;
         if (mainHand.isOf(Items.BOW) || offHand.isOf(Items.BOW)) return Role.DETECTIVE;
         return Role.NONE;
     }
@@ -215,6 +223,18 @@ public class MurderMystery extends Module {
 
         String title = Formatting.strip(objective.getDisplayName().getString());
         return title != null && MURDER_MYSTERY_TITLE.equals(title.trim());
+    }
+
+    private boolean isWaitingScoreboard() {
+        ScoreboardObjective objective = mc.world.getScoreboard().getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return false;
+
+        for (ScoreboardEntry score : mc.world.getScoreboard().getScoreboardEntries(objective)) {
+            String line = Formatting.strip(score.display().getString());
+            if (line != null && line.contains("Waiting...")) return true;
+        }
+
+        return false;
     }
 
     private enum Role {
