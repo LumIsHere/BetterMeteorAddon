@@ -24,22 +24,29 @@ import static meteordevelopment.meteorclient.renderer.text.CustomTextRenderer.SH
 
 @Mixin(value = CustomTextRenderer.class, remap = false)
 public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
-    @Shadow @Final private MeshBuilder mesh;
-    @Shadow private boolean building;
-    @Shadow private boolean scaleOnly;
-    @Shadow private double fontScale;
-    @Shadow private double scale;
+    @Shadow
+    @Final
+    private MeshBuilder mesh = new MeshBuilder(MeteorRenderPipelines.UI_TEXT);
 
-    private FontFix[] bettermeteor$fontsFix;
-    private FontFix bettermeteor$fontFix;
+    private FontFix[] fonts_fix;
+    private FontFix font_fix;
+
+    @Shadow
+    private boolean building;
+    @Shadow
+    private boolean scaleOnly;
+    @Shadow
+    private double fontScale = 1;
+    @Shadow
+    private double scale = 1;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void bettermeteor$init(FontFace fontFace, CallbackInfo ci) throws IOException {
+    public void onInit(FontFace fontFace, CallbackInfo ci) throws IOException {
         ByteBuffer buffer = fontFace.readToDirectByteBuffer();
 
-        bettermeteor$fontsFix = new FontFix[5];
-        for (int i = 0; i < bettermeteor$fontsFix.length; i++) {
-            bettermeteor$fontsFix[i] = new FontFix(buffer, (int) Math.round(27 * ((i * 0.5) + 1)));
+        fonts_fix = new FontFix[5];
+        for (int i = 0; i < fonts_fix.length; i++) {
+            fonts_fix[i] = new FontFix(buffer, (int) Math.round(27 * ((i * 0.5) + 1)));
         }
     }
 
@@ -53,8 +60,9 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
         if (!scaleOnly) mesh.begin();
 
         if (big) {
-            this.bettermeteor$fontFix = bettermeteor$fontsFix[bettermeteor$fontsFix.length - 1];
-        } else {
+            this.font_fix = fonts_fix[fonts_fix.length - 1];
+        }
+        else {
             double scaleA = Math.floor(scale * 10) / 10;
 
             int scaleI;
@@ -64,12 +72,13 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
             else if (scaleA >= 1.5) scaleI = 2;
             else scaleI = 1;
 
-            bettermeteor$fontFix = bettermeteor$fontsFix[scaleI - 1];
+            font_fix = fonts_fix[scaleI - 1];
         }
 
         this.building = true;
         this.scaleOnly = scaleOnly;
-        this.fontScale = bettermeteor$fontFix.getHeight() / 27.0;
+
+        this.fontScale = font_fix.getHeight() / 27.0;
         this.scale = 1 + (scale - fontScale) / fontScale;
     }
 
@@ -80,7 +89,7 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
     public double getWidth(String text, int length, boolean shadow) {
         if (text.isEmpty()) return 0;
 
-        FontFix font = building ? bettermeteor$fontFix : bettermeteor$fontsFix[0];
+        FontFix font = building ? this.font_fix : fonts_fix[0];
         return (font.getWidth(text, length) + (shadow ? 1 : 0)) * scale / 1.5;
     }
 
@@ -89,7 +98,7 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
      */
     @Overwrite
     public double getHeight(boolean shadow) {
-        FontFix font = building ? bettermeteor$fontFix : bettermeteor$fontsFix[0];
+        FontFix font = building ? this.font_fix : fonts_fix[0];
         return (font.getHeight() + 1 + (shadow ? 1 : 0)) * scale / 1.5;
     }
 
@@ -106,12 +115,13 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
             int preShadowA = SHADOW_COLOR.a;
             SHADOW_COLOR.a = (int) (color.a / 255.0 * preShadowA);
 
-            width = bettermeteor$fontFix.render(mesh, text, x + fontScale * scale / 1.5, y + fontScale * scale / 1.5, SHADOW_COLOR, scale / 1.5);
-            bettermeteor$fontFix.render(mesh, text, x, y, color, scale / 1.5);
+            width = font_fix.render(mesh, text, x + fontScale * scale / 1.5, y + fontScale * scale / 1.5, SHADOW_COLOR, scale / 1.5);
+            font_fix.render(mesh, text, x, y, color, scale / 1.5);
 
             SHADOW_COLOR.a = preShadowA;
-        } else {
-            width = bettermeteor$fontFix.render(mesh, text, x, y, color, scale / 1.5);
+        }
+        else {
+            width = font_fix.render(mesh, text, x, y, color, scale / 1.5);
         }
 
         if (!wasBuilding) end();
@@ -132,11 +142,13 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
                 .attachments(MinecraftClient.getInstance().getFramebuffer())
                 .pipeline(MeteorRenderPipelines.UI_TEXT)
                 .mesh(mesh)
-                .sampler("u_Texture", bettermeteor$fontFix.texture.getGlTextureView(), bettermeteor$fontFix.texture.getSampler())
+                .sampler("u_Texture", font_fix.texture.getGlTextureView(), font_fix.texture.getSampler())
                 .end();
         }
 
         building = false;
         scale = 1;
     }
+
+    public void destroy() {}
 }

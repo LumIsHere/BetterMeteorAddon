@@ -1,3 +1,7 @@
+/*
+ * Ported from meteor-translation-addon.
+ * Original font-fix author credit: Nippaku-Zanmu.
+ */
 package com.bettermeteor.addon.utils.font;
 
 import com.mojang.blaze3d.textures.FilterMode;
@@ -7,10 +11,10 @@ import meteordevelopment.meteorclient.renderer.MeshBuilder;
 import meteordevelopment.meteorclient.renderer.Texture;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTTPackContext;
 import org.lwjgl.stb.STBTTPackRange;
 import org.lwjgl.stb.STBTTPackedchar;
-import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTruetype;
 import org.lwjgl.system.MemoryStack;
 
@@ -19,62 +23,74 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Ported font atlas fix based on the original work by Nippaku-Zanmu.
- */
 public class FontFix {
     public Texture texture;
-
-    private static final int SIZE = 2048;
-
     private final int height;
     private final float scale;
     private final float ascent;
+    private final Int2ObjectOpenHashMap<CharData> charMap = new Int2ObjectOpenHashMap<>();
+    private final static int size = 2048;
+
     private final ByteBuffer buffer;
+    private final STBTTFontinfo fontInfo;
     private final ByteBuffer bitmap;
     private final STBTTPackContext packContext;
-    private final Int2ObjectOpenHashMap<CharData> charMap = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<STBTTPackedchar> packedChars = new Int2ObjectOpenHashMap<>();
 
-    private long loadTimer;
-    private int loadCount;
+    private long loadTimer = 0;
+    private int loadCount = 0;
     private final int loadSpeedLimit = 7;
+    // The number of string that can be loaded per 100ms
 
     public FontFix(ByteBuffer buffer, int height) {
         this.buffer = buffer;
         this.height = height;
 
-        STBTTFontinfo fontInfo = STBTTFontinfo.create();
+        // Initialize font
+        fontInfo = STBTTFontinfo.create();
         STBTruetype.stbtt_InitFont(fontInfo, buffer);
 
-        bitmap = BufferUtils.createByteBuffer(SIZE * SIZE);
-        packContext = STBTTPackContext.create();
-        STBTruetype.stbtt_PackBegin(packContext, bitmap, SIZE, SIZE, 0, 1);
+        // Allocate buffers
+        bitmap = BufferUtils.createByteBuffer(size * size);
 
-        texture = new Texture(SIZE, SIZE, TextureFormat.RED8, FilterMode.LINEAR, FilterMode.LINEAR);
+        // create and initialise packing context
+        packContext = STBTTPackContext.create();
+        STBTruetype.stbtt_PackBegin(packContext, bitmap, size, size, 0, 1);
+
+        // Create texture object and get font scale
+        texture = new Texture(size, size, TextureFormat.RED8, FilterMode.LINEAR, FilterMode.LINEAR);
         texture.upload(bitmap);
         scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, height);
 
+        // Get font vertical ascent
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer ascent = stack.mallocInt(1);
             STBTruetype.stbtt_GetFontVMetrics(fontInfo, ascent, null, null);
             this.ascent = ascent.get(0);
         }
 
+        // Preload basic ASCII characters
         preloadAsciiCharacters();
     }
 
     private void preloadAsciiCharacters() {
-        STBTTPackedchar.Buffer cdata = STBTTPackedchar.create(128);
+        STBTTPackedchar.Buffer cdata = STBTTPackedchar.create(128); // Basic Latin
+
+        // create the pack range
         STBTTPackRange.Buffer packRange = STBTTPackRange.create(1);
         packRange.put(STBTTPackRange.create().set(height, 32, null, 128, cdata, (byte) 2, (byte) 2));
         packRange.flip();
 
+        // pack font ranges
         STBTruetype.stbtt_PackFontRanges(packContext, buffer, 0, packRange);
 
+        // Load character data into charMap
         for (int i = 0; i < cdata.capacity(); i++) {
-            putCharData(i + 32, cdata.get(i));
+            STBTTPackedchar packedChar = cdata.get(i);
+            putCharData(i + 32, packedChar);
         }
 
+        // Create texture
         createTexture();
     }
 
@@ -84,9 +100,11 @@ public class FontFix {
             loadCount = 0;
         }
         if (loadCount >= loadSpeedLimit) return;
-
-        for (Integer codePoint : codePoints) loadCharacter(codePoint);
-
+        // Limit the load speed to avoid blocking the rendering thread
+        for (Integer codePoint : codePoints) {
+            loadCharacter(codePoint);
+        }
+        // Re-create texture
         createTexture();
         loadCount++;
     }
@@ -95,18 +113,23 @@ public class FontFix {
         if (charMap.containsKey(codePoint)) return;
 
         STBTTPackedchar.Buffer cdata = STBTTPackedchar.create(1);
+
+        // create the pack range
         STBTTPackRange.Buffer packRange = STBTTPackRange.create(1);
         packRange.put(STBTTPackRange.create().set(height, codePoint, null, 1, cdata, (byte) 2, (byte) 2));
         packRange.flip();
 
+        // pack font ranges
         STBTruetype.stbtt_PackFontRanges(packContext, buffer, 0, packRange);
-        putCharData(codePoint, cdata.get(0));
+
+        STBTTPackedchar packedChar = cdata.get(0);
+        putCharData(codePoint, packedChar);
+        packedChars.put(codePoint, packedChar);
     }
 
     private void putCharData(int codePoint, STBTTPackedchar packedChar) {
-        float ipw = 1f / SIZE;
-        float iph = 1f / SIZE;
-
+        float ipw = 1f / size; // pixel width and height
+        float iph = 1f / size;
         charMap.put(codePoint, new CharData(
             packedChar.xoff(),
             packedChar.yoff(),
@@ -121,19 +144,23 @@ public class FontFix {
     }
 
     private void createTexture() {
-        texture = new Texture(SIZE, SIZE, TextureFormat.RED8, FilterMode.LINEAR, FilterMode.LINEAR);
+        texture = new Texture(size, size, TextureFormat.RED8, FilterMode.LINEAR, FilterMode.LINEAR);
         texture.upload(bitmap);
     }
 
     public double getWidth(String string, int length) {
         double width = 0;
-        if (tryLoadString(string)) return width;
-
-        for (int i = 0; i < length; i++) {
-            CharData c = charMap.get(string.charAt(i));
-            if (c != null) width += c.xAdvance;
+        if (tryLoadString(string)) {
+            return width;
         }
-
+        for (int i = 0; i < length; i++) {
+            int cp = string.charAt(i);
+            CharData c = charMap.get(cp);
+            if (c == null) {
+                continue;
+            }
+            width += c.xAdvance;
+        }
         return width;
     }
 
@@ -141,21 +168,22 @@ public class FontFix {
         return height;
     }
 
-    private boolean tryLoadString(String string) {
-        boolean loading = false;
-        List<Integer> missingCodePoints = null;
-
-        for (int i = 0; i < string.length(); i++) {
-            int cp = string.charAt(i);
-            if (charMap.containsKey(cp)) continue;
-
-            if (missingCodePoints == null) missingCodePoints = new ArrayList<>();
-            missingCodePoints.add(cp);
-            loading = true;
+    private boolean tryLoadString(String s) {
+        boolean isLoading = false;
+        List<Integer> charPoints = null;
+        for (int i = 0; i < s.length(); i++) {
+            int cp = s.charAt(i);
+            CharData c = charMap.get(cp);
+            if (c == null) {
+                if (charPoints == null) charPoints = new ArrayList<>();
+                charPoints.add(cp);
+                isLoading = true;
+            }
         }
-
-        if (missingCodePoints != null) loadCharacter(missingCodePoints);
-        return loading;
+        if (charPoints != null) {
+            loadCharacter(charPoints);
+        }
+        return isLoading;
     }
 
     public double render(MeshBuilder mesh, String string, double x, double y, Color color, double scale) {
@@ -165,11 +193,12 @@ public class FontFix {
 
         int length = string.length();
         mesh.ensureCapacity(length * 4, length * 6);
-
         for (int i = 0; i < length; i++) {
-            CharData c = charMap.get(string.charAt(i));
-            if (c == null) continue;
-
+            int cp = string.charAt(i);
+            CharData c = charMap.get(cp);
+            if (c == null) {
+                continue;
+            }
             mesh.quad(
                 mesh.vec2(x + c.x0 * scale, y + c.y0 * scale).vec2(c.u0, c.v0).color(color).next(),
                 mesh.vec2(x + c.x0 * scale, y + c.y1 * scale).vec2(c.u0, c.v1).color(color).next(),
@@ -179,10 +208,10 @@ public class FontFix {
 
             x += c.xAdvance * scale;
         }
-
         return x;
     }
 
-    private record CharData(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float xAdvance) {
+    private record CharData(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
+                            float xAdvance) {
     }
 }
