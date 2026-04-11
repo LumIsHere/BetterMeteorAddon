@@ -1,17 +1,12 @@
 package com.bettermeteor.addon.modules;
 
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
-import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.BoolSetting;
-import meteordevelopment.meteorclient.settings.ColorSetting;
-import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -20,11 +15,9 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.vehicle.VehicleEntity;
-import net.minecraft.entity.ItemEntity;
 
 public class ShowHitbox extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRender = settings.createGroup("Render");
 
     private final Setting<Boolean> players = sgGeneral.add(new BoolSetting.Builder()
         .name("players")
@@ -96,46 +89,11 @@ public class ShowHitbox extends Module {
         .build()
     );
 
-    private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("How the hitboxes are rendered.")
-        .defaultValue(ShapeMode.Both)
-        .build()
-    );
-
-    private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("Fill color for the hitboxes.")
-        .defaultValue(new SettingColor(255, 0, 0, 25))
-        .visible(() -> shapeMode.get() != ShapeMode.Lines)
-        .build()
-    );
-
-    private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("Outline color for the hitboxes.")
-        .defaultValue(new SettingColor(255, 0, 0, 255))
-        .visible(() -> shapeMode.get() != ShapeMode.Sides)
-        .build()
-    );
-
     public ShowHitbox() {
-        super(Categories.Render, "show-hitbox", "Renders hitboxes for the entity types you choose.");
+        super(Categories.Render, "show-hitbox", "Uses vanilla Minecraft hitboxes for only the entity types you choose.");
     }
 
-    @EventHandler
-    private void onRender3D(Render3DEvent event) {
-        if (mc.world == null) return;
-
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity == null || entity == mc.player || !entity.isAlive()) continue;
-            if (!shouldRender(entity)) continue;
-
-            event.renderer.box(entity.getBoundingBox(), sideColor.get(), lineColor.get(), shapeMode.get(), 0);
-        }
-    }
-
-    private boolean shouldRender(Entity entity) {
+    public boolean shouldRender(Entity entity) {
         if (entity instanceof PlayerEntity) return players.get();
         if (entity instanceof EndCrystalEntity) return crystals.get();
         if (entity instanceof ItemEntity) return items.get();

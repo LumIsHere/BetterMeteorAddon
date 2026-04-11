@@ -3,6 +3,8 @@
   "package": "com.bettermeteor.addon.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "DebugRendererShowHitboxMixin",
+    "EntityHitboxDebugRendererShowHitboxMixin",
     "EntityRendererOutlineMixin",
     "WorldRendererOutlineMixin",
     "WidgetScreenModuleAnimationMixin",
