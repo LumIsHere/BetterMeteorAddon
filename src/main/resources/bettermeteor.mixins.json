@@ -3,6 +3,7 @@
   "package": "com.bettermeteor.addon.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "CustomTextRendererFontFixMixin",
     "DebugRendererShowHitboxMixin",
     "EntityHitboxDebugRendererShowHitboxMixin",
     "EntityRendererOutlineMixin",

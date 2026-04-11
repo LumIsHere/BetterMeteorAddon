@@ -1,5 +1,6 @@
 package com.bettermeteor.addon.mixin;
 
+import com.bettermeteor.addon.BetterMeteorAddon;
 import com.bettermeteor.addon.utils.font.FontFix;
 import meteordevelopment.meteorclient.renderer.MeshBuilder;
 import meteordevelopment.meteorclient.renderer.MeshRenderer;
@@ -48,6 +49,8 @@ public abstract class CustomTextRendererFontFixMixin implements TextRenderer {
         for (int i = 0; i < fonts_fix.length; i++) {
             fonts_fix[i] = new FontFix(buffer, (int) Math.round(27 * ((i * 0.5) + 1)));
         }
+
+        BetterMeteorAddon.LOG.info("BetterMeteor font fix initialized for font {}", fontFace);
     }
 
     /**
