@@ -3,6 +3,8 @@
   "package": "com.bettermeteor.addon.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "EntityRendererOutlineMixin",
+    "WorldRendererOutlineMixin",
     "WidgetScreenModuleAnimationMixin",
     "MeteorGuiThemeMixin",
     "PlayerEntityRendererMixin",
