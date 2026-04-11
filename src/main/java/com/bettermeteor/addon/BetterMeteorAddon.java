@@ -13,9 +13,11 @@ import com.bettermeteor.addon.utils.font.FontFaceListSetting;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
+import meteordevelopment.meteorclient.renderer.Fonts;
 import meteordevelopment.meteorclient.gui.widgets.WLabel;
 import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
 import meteordevelopment.meteorclient.gui.utils.SettingsWidgetFactory;
+import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.systems.hud.Hud;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Category;
@@ -67,6 +69,16 @@ public class BetterMeteorAddon extends MeteorAddon {
 
         // HUD
         Hud.get().register(EnderPearlInfoHud.INFO);
+
+        Config config = Config.get();
+        if (config != null && config.customFont.get()) {
+            if (Fonts.RENDERER != null) {
+                Fonts.RENDERER.destroy();
+                Fonts.RENDERER = null;
+            }
+
+            Fonts.load(config.font.get());
+        }
     }
 
     @Override
