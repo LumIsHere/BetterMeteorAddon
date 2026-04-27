@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "meteor-translation-addon",
+  "version": "${version}",
+  "name": "Meteor Translation Addon",
+  "description": "An addon offers unicode font rendering fix and translation for Meteor.",
+  "authors": [
+    "Nippaku Zanmu"
+  ],
+  "contact": {
+    "repo": "https://github.com/MeteorDevelopment/meteor-addon-template"
+  },
+  "icon": "assets/meteor-translation-addon/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "com.nippaku_zanmu.trans_addon.MeteorTranslation"
+    ]
+  },
+  "mixins": [
+    "addon-translation.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "231,25,25"
+  },
+  "depends": {
+    "java": ">=17",
+    "minecraft": [">=1.21"],
+    "meteor-client": "*"
+  }
+}

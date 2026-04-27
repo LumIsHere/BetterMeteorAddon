@@ -2,7 +2,9 @@ package com.bettermeteor.addon;
 
 import com.bettermeteor.addon.gui.screens.settings.FontFaceListSettingScreen;
 import com.bettermeteor.addon.hud.EnderPearlInfoHud;
+import com.bettermeteor.addon.hud.WhatsBelowMeHud;
 import com.bettermeteor.addon.modules.Crystal;
+import com.bettermeteor.addon.modules.DigDown;
 import com.bettermeteor.addon.modules.HandChams;
 import com.bettermeteor.addon.modules.MurderMystery;
 import com.bettermeteor.addon.modules.ShowHitbox;
@@ -66,9 +68,11 @@ public class BetterMeteorAddon extends MeteorAddon {
         Modules.get().add(new HandChams());
         Modules.get().add(new ShowHitbox());
         Modules.get().add(new MurderMystery());
+        Modules.get().add(new DigDown());
 
         // HUD
         Hud.get().register(EnderPearlInfoHud.INFO);
+        Hud.get().register(WhatsBelowMeHud.INFO);
 
         Config config = Config.get();
         if (config != null && config.customFont.get()) {
