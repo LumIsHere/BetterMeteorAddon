@@ -37,7 +37,7 @@ public class WhatsBelowMeHud extends HudElement {
     private final Setting<Integer> columnWidth = sgGeneral.add(new IntSetting.Builder()
         .name("column-width")
         .description("Width of the 2D block column.")
-        .defaultValue(18)
+        .defaultValue(10)
         .range(4, 120)
         .sliderRange(4, 80)
         .build()
@@ -46,7 +46,7 @@ public class WhatsBelowMeHud extends HudElement {
     private final Setting<Integer> blockHeight = sgGeneral.add(new IntSetting.Builder()
         .name("block-height")
         .description("Height of each block row.")
-        .defaultValue(12)
+        .defaultValue(9)
         .range(4, 32)
         .sliderRange(4, 24)
         .build()
@@ -55,7 +55,7 @@ public class WhatsBelowMeHud extends HudElement {
     private final Setting<Integer> padding = sgGeneral.add(new IntSetting.Builder()
         .name("padding")
         .description("Space around the HUD element.")
-        .defaultValue(4)
+        .defaultValue(0)
         .min(0)
         .sliderRange(0, 20)
         .build()
@@ -64,14 +64,14 @@ public class WhatsBelowMeHud extends HudElement {
     private final Setting<Boolean> showText = sgGeneral.add(new BoolSetting.Builder()
         .name("show-text")
         .description("Show player coordinates and column range.")
-        .defaultValue(true)
+        .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> background = sgRender.add(new BoolSetting.Builder()
         .name("background")
         .description("Render a background behind the column.")
-        .defaultValue(true)
+        .defaultValue(false)
         .build()
     );
 
